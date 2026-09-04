@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ស្កេនរកកាមេរ៉ាលាក់ — ការពារភាពឯកជនក្នុងបន្ទប់សណ្ឋាគារ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D0B14;
+    --surface:#171320;
+    --surface-2:#1F1A2B;
+    --line:#2C2538;
+    --ir:#FF3D81;
+    --ir-dim:#7A2244;
+    --amber:#FFB454;
+    --safe:#34D2C4;
+    --text:#F3F1F7;
+    --muted:#9C93AC;
+    --mono-ui:'Space Grotesk', sans-serif;
+    --khmer:'Noto Sans Khmer', 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--khmer);
+    line-height:1.7;
+    font-size:16px;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.ui-label{font-family:var(--khmer);}
+  a{color:inherit;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+
+  /* Background texture: faint scan-grid */
+  .grid-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,61,129,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,61,129,0.035) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(circle at 50% 0%, black, transparent 75%);
+  }
+
+  /* NAV */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(13,11,20,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; max-width:1180px; margin:0 auto;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-weight:700; font-size:1.05rem; letter-spacing:0.2px;
+  }
+  .logo-dot{
+    width:12px; height:12px; border-radius:50%;
+    background:var(--ir);
+    box-shadow:0 0 0 3px var(--ir-dim), 0 0 14px var(--ir);
+    animation:pulse-dot 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{
+    0%,100%{opacity:1;} 50%{opacity:0.45;}
+  }
+  .nav-links{display:flex; gap:28px; font-size:0.93rem; color:var(--muted);}
+  .nav-links a{text-decoration:none; transition:color .2s;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    background:var(--ir); color:#1a0510; padding:10px 20px; border-radius:8px;
+    font-weight:600; font-size:0.9rem; text-decoration:none; white-space:nowrap;
+  }
+  .menu-btn{display:none; background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer;}
+
+  /* HERO */
+  .hero{
+    position:relative; z-index:1;
+    padding:76px 0 60px;
+    display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;
+  }
+  .eyebrow-line{
+    display:flex; align-items:center; gap:10px; margin-bottom:20px;
+    color:var(--amber); font-size:0.85rem; font-weight:600;
+  }
+  .eyebrow-line::before{content:''; width:26px; height:1px; background:var(--amber);}
+  h1{
+    font-size:2.65rem; font-weight:700; line-height:1.28; letter-spacing:-0.5px;
+    margin-bottom:22px;
+  }
+  h1 span{color:var(--ir);}
+  .hero p{color:var(--muted); font-size:1.05rem; max-width:52ch; margin-bottom:32px;}
+  .btn-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn-primary, .btn-ghost{
+    padding:14px 26px; border-radius:9px; font-weight:600; font-size:0.98rem;
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px; cursor:pointer; border:none;
+    font-family:var(--khmer);
+  }
+  .btn-primary{background:var(--ir); color:#1a0510;}
+  .btn-primary:hover{background:#ff5a95;}
+  .btn-ghost{background:transparent; color:var(--text); border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--muted);}
+
+  /* Hero viewfinder illustration */
+  .viewfinder{
+    position:relative; aspect-ratio:4/5; border-radius:18px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,61,129,0.10), transparent 55%),
+      linear-gradient(160deg, #14101E 0%, #0A0812 100%);
+    border:1px solid var(--line); overflow:hidden;
+  }
+  .vf-corner{position:absolute; width:26px; height:26px; border:2px solid var(--ir);}
+  .vf-corner.tl{top:16px; left:16px; border-right:none; border-bottom:none;}
+  .vf-corner.tr{top:16px; right:16px; border-left:none; border-bottom:none;}
+  .vf-corner.bl{bottom:16px; left:16px; border-right:none; border-top:none;}
+  .vf-corner.br{bottom:16px; right:16px; border-left:none; border-top:none;}
+  .vf-room{
+    position:absolute; inset:40px; border-radius:8px;
+    background:linear-gradient(180deg, #1b1428, #100c1a);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vf-icon{width:42%; opacity:0.85;}
+  .glow-dot{
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    background:var(--ir); box-shadow:0 0 18px 6px rgba(255,61,129,0.7);
+    animation:blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.3; transform:scale(0.85);}}
+  .vf-readout{
+    position:absolute; bottom:16px; left:16px; right:16px;
+    display:flex; justify-content:space-between; font-family:var(--mono-ui);
+    font-size:0.7rem; letter-spacing:0.5px; color:var(--safe); opacity:0.9;
+  }
+
+  /* SECTION generic */
+  section{position:relative; z-index:1; padding:80px 0;}
+  .section-head{max-width:640px; margin-bottom:48px;}
+  .section-tag{color:var(--amber); font-size:0.85rem; font-weight:600; margin-bottom:14px; display:block;}
+  .section-head h2{font-size:1.9rem; font-weight:700; line-height:1.35; margin-bottom:14px;}
+  .section-head p{color:var(--muted); font-size:1rem;}
+
+  /* HOW IT WORKS cards */
+  .science-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .science-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:28px;
+  }
+  .science-num{font-family:var(--mono-ui); color:var(--ir); font-size:0.85rem; margin-bottom:16px; display:block;}
+  .science-card h3{font-size:1.15rem; margin-bottom:10px; font-weight:600;}
+  .science-card p{color:var(--muted); font-size:0.94rem;}
+
+  /* SCANNER TOOL */
+  .scanner-section{
+    background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .scanner-layout{display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start;}
+  .scanner-steps{list-style:none; counter-reset:step;}
+  .scanner-steps li{
+    counter-increment:step; padding:16px 0 16px 44px; position:relative; border-bottom:1px solid var(--line);
+    color:var(--muted); font-size:0.95rem;
+  }
+  .scanner-steps li:last-child{border-bottom:none;}
+  .scanner-steps li::before{
+    content:counter(step); position:absolute; left:0; top:14px;
+    width:28px; height:28px; border-radius:50%; background:var(--surface-2); border:1px solid var(--ir);
+    color:var(--ir); font-family:var(--mono-ui); font-size:0.8rem; display:flex; align-items:center; justify-content:center;
+  }
+  .scanner-steps b{color:var(--text); font-weight:600;}
+  .scanner-box{
+    background:#000; border-radius:16px; overflow:hidden; border:1px solid var(--line);
+    position:relative; aspect-ratio:3/4;
+  }
+  #camFeed{width:100%; height:100%; object-fit:cover; display:block;}
+  .scanner-placeholder{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; text-align:center; padding:24px; color:var(--muted); background:linear-gradient(180deg,#161020,#0a0712);
+  }
+  .scanner-placeholder svg{width:52px; opacity:0.6;}
+  .scan-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg, transparent 0%, transparent 85%, rgba(255,61,129,0.15) 100%);
+  }
+  .scan-line{
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--ir), transparent);
+    box-shadow:0 0 12px var(--ir);
+    animation:sweep 2.8s linear infinite;
+  }
+  @keyframes sweep{0%{top:0%;} 100%{top:100%;}}
+  .scanner-controls{
+    position:absolute; bottom:0; left:0; right:0; padding:16px;
+    display:flex; gap:10px; background:linear-gradient(0deg, rgba(0,0,0,0.75), transparent);
+  }
+  .scan-btn{
+    flex:1; padding:12px 14px; border-radius:9px; border:1px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.06); color:#fff; font-family:var(--khmer); font-size:0.85rem;
+    cursor:pointer; backdrop-filter:blur(4px);
+  }
+  .scan-btn.active{background:var(--ir); border-color:var(--ir); color:#1a0510; font-weight:600;}
+  .scan-status{
+    position:absolute; top:14px; left:14px; font-family:var(--mono-ui); font-size:0.68rem;
+    color:var(--safe); background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:6px; letter-spacing:0.4px;
+  }
+  .scanner-note{
+    margin-top:16px; font-size:0.85rem; color:var(--muted); background:var(--surface-2);
+    border:1px solid var(--line); border-left:3px solid var(--amber); padding:14px 16px; border-radius:8px;
+  }
+
+  /* HIDING SPOTS GRID */
+  .spots-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  .spot-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:22px 18px;
+    text-align:center; transition:border-color .2s, transform .2s;
+  }
+  .spot-card:hover{border-color:var(--ir-dim); transform:translateY(-3px);}
+  .spot-icon{
+    width:44px; height:44px; margin:0 auto 14px; border-radius:10px; background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .spot-icon svg{width:22px; height:22px; stroke:var(--ir);}
+  .spot-card h4{font-size:0.92rem; font-weight:600; margin-bottom:6px;}
+  .spot-card p{font-size:0.8rem; color:var(--muted); line-height:1.5;}
+
+  /* METHODS ROW (RF / WiFi / mirror) */
+  .methods-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .method-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px;
+  }
+  .method-card .tag{
+    display:inline-block; font-family:var(--mono-ui); font-size:0.68rem; letter-spacing:0.5px;
+    color:var(--amber); background:rgba(255,180,84,0.1); padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .method-card h3{font-size:1.05rem; margin-bottom:10px; font-weight:600;}
+  .method-card p{color:var(--muted); font-size:0.9rem;}
+
+  /* WHAT TO DO steps */
+  .action-steps{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+  .action-step{position:relative; padding-top:36px;}
+  .action-step .n{
+    font-family:var(--mono-ui); font-size:2rem; font-weight:700; color:var(--ir-dim);
+    position:absolute; top:-6px; left:0;
+  }
+  .action-step h4{font-size:1rem; font-weight:600; margin-bottom:8px;}
+  .action-step p{font-size:0.88rem; color:var(--muted);}
+
+  /* FAQ accordion */
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-q{
+    width:100%; text-align:left; background:none; border:none; color:var(--text);
+    font-family:var(--khmer); font-size:1rem; font-weight:600; padding:20px 0;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  }
+  .faq-q .plus{font-family:var(--mono-ui); color:var(--ir); font-size:1.2rem; transition:transform .25s;}
+  .faq-item.open .plus{transform:rotate(45deg);}
+  .faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease; color:var(--muted); font-size:0.92rem;}
+  .faq-a-inner{padding-bottom:20px; max-width:70ch;}
+
+  footer{
+    border-top:1px solid var(--line); padding:40px 0; position:relative; z-index:1;
+  }
+  .foot-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
+  .foot-note{color:var(--muted); font-size:0.82rem; max-width:60ch;}
+
+  /* Responsive */
+  @media (max-width:860px){
+    .menu-btn{display:block;}
+    .nav-links{
+      position:absolute; top:100%; left:0; right:0; background:var(--surface);
+      flex-direction:column; padding:20px 24px; gap:18px; border-bottom:1px solid var(--line);
+      display:none;
+    }
+    .nav-links.open{display:flex;}
+    .nav-cta{display:none;}
+    .hero{grid-template-columns:1fr; padding-top:44px; gap:40px;}
+    h1{font-size:2rem;}
+    .viewfinder{max-width:380px; margin:0 auto;}
+    .science-grid, .methods-grid{grid-template-columns:1fr;}
+    .scanner-layout{grid-template-columns:1fr;}
+    .scanner-box{order:-1; max-width:420px; margin:0 auto;}
+    .spots-grid{grid-template-columns:repeat(2,1fr);}
+    .action-steps{grid-template-columns:repeat(2,1fr);}
+    section{padding:56px 0;}
+    .section-head h2{font-size:1.5rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-dot"></span> ScanRoom</div>
+    <div class="nav-links" id="navLinks">
+      <a href="#how">របៀបធ្វើការ</a>
+      <a href="#scan">ស្កេនឥឡូវ</a>
+      <a href="#spots">ចំណុចលាក់</a>
+      <a href="#methods">វិធីផ្សេងទៀត</a>
+      <a href="#faq">សំណួរញឹកញាប់</a>
+    </div>
+    <a href="#scan" class="nav-cta">ចាប់ផ្តើមស្កេន</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" style="padding-bottom:60px;">
+    <div>
+      <span class="eyebrow-line">ការពារភាពឯកជនរបស់អ្នក</span>
+      <h1>តើបន្ទប់សណ្ឋាគារដែលអ្នកជួល <span>មានកាមេរ៉ាលាក់</span> ដែរឬទេ?</h1>
+      <p>មុននឹងសម្រាកលក់ ឬផ្លាស់សម្លៀកបំពាក់ ចំណាយពេល ២ នាទីពិនិត្យបន្ទប់ជាមួយឧបករណ៍ស្កេនតាមកាមេរ៉ាទូរស័ព្ទរបស់អ្នក បូករួមនឹងបញ្ជីចំណុចដែលគេច្រើនលាក់កាមេរ៉ា។ ឥតគិតថ្លៃ ប្រើប្រាស់ដោយផ្ទាល់នៅលើគេហទំព័រ មិនចាំបាច់ទាញកម្មវិធីអ្វីទាំងអស់។</p>
+      <div class="btn-row">
+        <a href="#scan" class="btn-primary">បើកកាមេរ៉ាហើយចាប់ផ្តើមស្កេន</a>
+        <a href="#spots" class="btn-ghost">មើលចំណុចលាក់ទូទៅ</a>
+      </div>
+    </div>
+    <div class="viewfinder">
+      <span class="vf-corner tl"></span><span class="vf-corner tr"></span>
+      <span class="vf-corner bl"></span><span class="vf-corner br"></span>
+      <div class="vf-room">
+        <svg class="vf-icon" viewBox="0 0 120 120" fill="none" stroke="#3a3350" stroke-width="2">
+          <rect x="20" y="30" width="80" height="55" rx="4"/>
+          <circle cx="60" cy="57" r="14" stroke="#5a4d76"/>
+          <rect x="45" y="20" width="30" height="12" rx="2"/>
+        </svg>
+        <div class="glow-dot" style="top:44%; left:47%;"></div>
+      </div>
+      <div class="vf-readout"><span>REC ● LIVE</span><span>IR: DETECTED 1</span></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="section-head">
+      <span class="section-tag">គោលការណ៍</span>
+      <h2>ហេតុអ្វីវិធីនេះដំណើរការ?</h2>
+      <p>កាមេរ៉ាលាក់ភាគច្រើនប្រើសម្រាប់មើលពេលយប់ (night-vision) ត្រូវការភ្លើង LED ក្រហមអាប់ (Infrared) ដែលភ្នែកមនុស្សមើលមិនឃើញ ប៉ុន្តែកញ្ចក់កាមេរ៉ាទូរស័ព្ទភាគច្រើនអាចចាប់ពន្លឺនេះបាន។</p>
+    </div>
+    <div class="science-grid">
+      <div class="science-card">
+        <span class="science-num">01</span>
+        <h3>ភ្លើង Infrared</h3>
+        <p>កាមេរ៉ាលាក់ភ្នែកមនុស្សភាគច្រើនប្រើភ្លើង IR LED ដើម្បីថតយប់។ ភ្លើងនេះមើលមិនឃើញនឹងភ្នែក ប៉ុន្តែសែនស័រកាមេរ៉ាទូរស័ព្ទចាប់វាបានក្នុងទីងងឹត។</p>
+      </div>
+      <div class="science-card">
+        <span class="science-num">02</span>
+        <h3>ការឆ្លុះកញ្ចក់កែវ</h3>
+        <p>រាល់កញ្ចក់ lens សុទ្ធតែឆ្លុះពន្លឺមកវិញជាចំណុចភ្លឺតូចមួយ (glint) ខុសពីវត្ថុជុំវិញ ជាពិសេសពេលបញ្ចាំងពន្លឺពីម្ខាង។</p>
+      </div>
+      <div class="science-card">
+        <span class="science-num">03</span>
+        <h3>រលកសញ្ញា RF/WiFi</h3>
+        <p>កាមេរ៉ាលាក់ដែលបញ្ជូនវីដេអូតាមអនឡាញ ត្រូវការភ្ជាប់បណ្តាញ ដូច្នេះអាចរកឃើញតាមឧបករណ៍ស្កេនរលក ឬពិនិត្យឧបករណ៍ភ្ជាប់ WiFi។</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCANNER -->
+  <section id="scan" class="scanner-section">
+    <div class="wrap" style="padding:0;">
+      <div class="section-head">
+        <span class="section-tag">ឧបករណ៍ស្កេន</span>
+        <h2>ស្កេនបន្ទប់ជាមួយកាមេរ៉ាទូរស័ព្ទរបស់អ្នក</h2>
+        <p>បិទភ្លើងបន្ទប់ឲ្យងងឹតតាមដែលអាចធ្វើបាន រួចបើកកាមេរ៉ាខាងក្រោម បន្ទាប់មកបង្វិលទូរស័ព្ទឲ្យទូទាំងបន្ទប់យឺតៗ ដើម្បីរកចំណុចពន្លឺរលោង ឬពន្លឺក្រហមអាប់ៗពីវត្ថុនានា។</p>
+      </div>
+      <div class="scanner-layout">
+        <ol class="scanner-steps">
+          <li><b>ជំហានទី ១ —</b> បិទភ្លើងបន្ទប់ទាំងអស់ ទាញវាំងនន បិទបង្អួច ធ្វើឲ្យបន្ទប់ងងឹតតាមដែលអាចធ្វើបាន។</li>
+          <li><b>ជំហានទី ២ —</b> ចុច "បើកកាមេរ៉ា" ខាងក្រោម ហើយអនុញ្ញាតឲ្យកម្មវិធីប្រើកាមេរ៉ា។</li>
+          <li><b>ជំហានទី ៣ —</b> បើទូរស័ព្ទអ្នកមានភ្លើងបំភ្លឺ (torch) អាចចុចប៊ូតុង "ភ្លើង" ដើម្បីជួយបំភ្លឺ ខណៈកំពុងសម្លឹងកញ្ចក់ពីចម្ងាយ។</li>
+          <li><b>ជំហានទី ៤ —</b> បង្វិលទូរស័ព្ទឲ្យគ្រប់ទិសដៅ — ពិសេសទៅរក ប្រព័ន្ធរកផ្សែង នាឡិកា ដុំសាកថ្ម កញ្ចក់ និងធ្នើសៀគ្វី។ សម្លឹងរកចំណុចភ្លឺតូចមួយ ដូចផ្កាយ ដែលមិនរំកិលទៅតាមពន្លឺជុំវិញ។</li>
+        </ol>
+        <div class="scanner-box">
+          <video id="camFeed" autoplay playsinline muted></video>
+          <div class="scanner-placeholder" id="camPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <div>កាមេរ៉ានៅមិនទាន់បើកទេ<br>ចុចប៊ូតុងខាងក្រោមដើម្បីចាប់ផ្តើម</div>
+          </div>
+          <div class="scan-overlay" id="scanOverlay" style="display:none;">
+            <div class="scan-line"></div>
+          </div>
+          <div class="scan-status" id="scanStatus" style="display:none;">SCANNING…</div>
+          <div class="scanner-controls">
+            <button class="scan-btn" id="startBtn">📷 បើកកាមេរ៉ា</button>
+            <button class="scan-btn" id="torchBtn" style="display:none;">💡 ភ្លើង</button>
+            <button class="scan-btn" id="switchBtn" style="display:none;">🔄 ប្តូរកាមេរ៉ា</button>
+          </div>
+        </div>
+      </div>
+      <div class="scanner-note">
+        <b>សំខាន់៖</b> ការស្កេននេះជាឧបករណ៍ជំនួយប៉ុណ្ណោះ មិនអាចធានា ១០០% ថារកឃើញកាមេរ៉ាទាំងអស់ទេ ព្រោះកាមេរ៉ាទំនើបខ្លះមិនប្រើភ្លើង IR ឬដាក់កញ្ចក់តូចខ្លាំង។ គួរប្រើផ្សំជាមួយការពិនិត្យដោយដៃ (សូមមើលផ្នែក "ចំណុចលាក់ទូទៅ" និង "វិធីផ្សេងទៀត" ខាងក្រោម)។ គេហទំព័រនេះមិនផ្ញើរូបភាព ឬវីដេអូរបស់អ្នកទៅកន្លែងណាមួយឡើយ — ដំណើរការនៅលើទូរស័ព្ទអ្នកតែម្នាក់ឯង។
+      </div>
+    </div>
+  </section>
+
+  <!-- HIDING SPOTS -->
+  <section id="spots">
+    <div class="section-head">
+      <span class="section-tag">ចំណុចគួរពិនិត្យ</span>
+      <h2>ចំណុចទូទៅដែលគេច្រើនលាក់កាមេរ៉ា</h2>
+      <p>ធ្វើការត្រួតពិនិត្យដោយភ្នែក និងដៃលើវត្ថុទាំងនេះជាមុនសិន មុននឹងប្រើឧបករណ៍ស្កេន។</p>
+    </div>
+    <div class="spots-grid">
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h4>ប្រព័ន្ធរកផ្សែង</h4>
+        <p>មើលថាមានប្រហោង ឬកញ្ចក់តូចមិនធម្មតានៅចំកណ្តាលឬដែរឬទេ</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 8v5l3 2"/></svg></div>
+        <h4>នាឡិកាឌីជីថល</h4>
+        <p>ពិនិត្យផ្នែកខាងមុខសម្រាប់រន្ធតូចមួយ ដែលមិនមែនជាផ្នែកនៃការរចនា</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg></div>
+        <h4>ដុំសាកថ្ម USB</h4>
+        <p>ដុំសាកដែលមានរន្ធកញ្ចក់តូចមួយអាចជាកាមេរ៉ាក្លែងបន្លំ</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 5-6 4 5"/></svg></div>
+        <h4>កញ្ចក់ជញ្ជាំង / កញ្ចក់ខ្លួន</h4>
+        <p>ធ្វើតេស្តចុចម្រាមដៃលើកញ្ចក់ — មើលផ្នែក "តេស្តកញ្ចក់" ខាងក្រោម</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="2" y="9" width="6" height="6"/><path d="M8 12h13M17 8v8"/></svg></div>
+        <h4>ដោតភ្លើងជញ្ជាំង</h4>
+        <p>ដោតដែលមានរន្ធកញ្ចក់មិនធម្មតា ឬដាក់ខុសទីតាំងធម្មតា</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M4 21h16M12 21V9M12 9c-3 0-5-2-5-5 3 0 5 2 5 5zm0 0c3 0 5-2 5-5-3 0-5 2-5 5z"/></svg></div>
+        <h4>ដើមឈើ/ផ្កាសិប្បនិម្មិត</h4>
+        <p>ស្លឹកឈើក្លែងក្លាយអាចលាក់កញ្ចក់កាមេរ៉ាបានយ៉ាងងាយ</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg></div>
+        <h4>ក្របរូបភាព</h4>
+        <p>ក្របតុបតែងជញ្ជាំងអាចលាក់រន្ធកាមេរ៉ានៅមុំណាមួយ</p>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V6a4 4 0 018 0v2"/></svg></div>
+        <h4>ប្រអប់ក្រដាសជូតមុខ</h4>
+        <p>ប្រអប់ដែលដាក់ត្រង់មុខគ្រែ ឬតុ អាចលាក់កាមេរ៉ារន្ធតូច</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- OTHER METHODS -->
+  <section id="methods">
+    <div class="section-head">
+      <span class="section-tag">ការពិនិត្យបន្ថែម</span>
+      <h2>វិធីផ្សេងទៀតដើម្បីប្រាកដច្បាស់</h2>
+      <p>ការស្កេនតាមកាមេរ៉ាមិនអាចរកឃើញកាមេរ៉ាទំនើបគ្រប់ប្រភេទបានទេ ចូរប្រើវិធីទាំងនេះជាបន្ថែម។</p>
+    </div>
+    <div class="methods-grid">
+      <div class="method-card">
+        <span class="tag">តេស្តកញ្ចក់</span>
+        <h3>ចុចម្រាមដៃលើកញ្ចក់</h3>
+        <p>ដាក់ចុងម្រាមដៃទល់នឹងផ្ទៃកញ្ចក់។ បើមានចន្លោះរវាងម្រាមដៃ និងស្រមោលរបស់វា — វាជាកញ្ចក់ធម្មតា។ បើម្រាមដៃប៉ះនឹងស្រមោលរបស់វាភ្លាមៗដោយគ្មានចន្លោះ — វាអាចជាកញ្ចក់ឆ្លុះម្ខាង (two-way mirror)។</p>
+      </div>
+      <div class="method-card">
+        <span class="tag">ពិនិត្យ WiFi</span>
+        <h3>ពិនិត្យឧបករណ៍ភ្ជាប់បណ្តាញ</h3>
+        <p>ប្រើកម្មវិធីស្កេនបណ្តាញដូចជា Fing ដើម្បីមើលបញ្ជីឧបករណ៍ភ្ជាប់ WiFi ក្នុងបន្ទប់។ ឈ្មោះឧបករណ៍ចម្លែក ដូចជា "IPCAM" ឬ "DVR" គួរឲ្យសង្ស័យ។</p>
+      </div>
+      <div class="method-card">
+        <span class="tag">ឧបករណ៍ RF</span>
+        <h3>ប្រើឧបករណ៍រកសញ្ញា RF</h3>
+        <p>ឧបករណ៍តូចៗតម្លៃថោក អាចទិញបានតាមអនឡាញ ជួយចាប់សញ្ញារលកដែលកាមេរ៉ាឥតខ្សែបញ្ជូនចេញ — មានប្រយោជន៍សម្រាប់អ្នកធ្វើដំណើរញឹកញាប់។</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT TO DO IF FOUND -->
+  <section>
+    <div class="section-head">
+      <span class="section-tag">បើរកឃើញ</span>
+      <h2>ត្រូវធ្វើដូចម្តេចបើសង្ស័យ ឬរកឃើញកាមេរ៉ា?</h2>
+    </div>
+    <div class="action-steps">
+      <div class="action-step"><span class="n">01</span><h4>កុំប៉ះពាល់វា</h4><p>ទុកវាកន្លែងដដែល ដើម្បីជាភស្តុតាង កុំបំបែក ឬដកចេញភ្លាមៗ</p></div>
+      <div class="action-step"><span class="n">02</span><h4>ថតរូបភស្តុតាង</h4><p>ថតរូប ឬវីដេអូទីតាំង និងស្ថានភាពដែលអ្នករកឃើញ</p></div>
+      <div class="action-step"><span class="n">03</span><h4>ចាកចេញ និងជូនដំណឹង</h4><p>ប្តូរបន្ទប់ ឬចាកចេញ រួចទាក់ទងអ្នកគ្រប់គ្រងសណ្ឋាគារ ឬអាជ្ញាធរមូលដ្ឋាន</p></div>
+      <div class="action-step"><span class="n">04</span><h4>ជូនដំណឹងអាជ្ញាធរ</h4><p>ករណីធ្ងន់ធ្ងរ គួររាយការណ៍ទៅប៉ូលីស ដើម្បីស៊ើបអង្កេតបន្ត</p></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-head">
+      <span class="section-tag">សំណួរញឹកញាប់</span>
+      <h2>សំណួរដែលគេសួរញឹកញាប់</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q">តើគេហទំព័រនេះទុករូបភាព ឬវីដេអូរបស់ខ្ញុំដែរឬទេ?<span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">ទេ។ រូបភាពពីកាមេរ៉ាដំណើរការនៅក្នុងកម្មវិធីរុករករបស់អ្នកតែម្នាក់ឯង គ្មានទិន្នន័យណាមួយផ្ញើចេញទៅម៉ាស៊ីនមេ ឬរក្សាទុកនៅកន្លែងណាមួយឡើយ។</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">ហេតុអ្វីប៊ូតុងភ្លើងមិនដំណើរការលើទូរស័ព្ទរបស់ខ្ញុំ?<span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">ការគ្រប់គ្រងភ្លើងបំភ្លឺ (torch) តាមរយៈគេហទំព័រ គាំទ្រតែលើទូរស័ព្ទ Android មួយចំនួន និងកម្មវិធីរុករក Chrome ប៉ុណ្ណោះ។ iPhone (Safari) មិនអនុញ្ញាតឲ្យគេហទំព័រគ្រប់គ្រងភ្លើងបានទេ សូមប្រើភ្លើងបំភ្លឺធម្មតារបស់ទូរស័ព្ទដាច់ដោយឡែក។</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">តើវិធីនេះធានារកឃើញកាមេរ៉ាបានទាំងអស់ទេ?<span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">ទេ។ វិធីនេះជួយបានសម្រាប់កាមេរ៉ាដែលប្រើភ្លើង IR ឬកញ្ចក់ lens ធម្មតា ប៉ុន្តែកាមេរ៉ាតូចខ្លាំង ឬកាមេរ៉ាទំនើបគ្មានភ្លើង IR អាចរកមិនឃើញ។ គួរប្រើផ្សំជាមួយការពិនិត្យដោយដៃ និងឧបករណ៍ RF ។</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">តើអាចប្រើនៅលើកុំព្យូទ័របានទេ?<span class="plus">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">អាចប្រើបាន បើកុំព្យូទ័រនោះមានកាមេរ៉ា ប៉ុន្តែវិធីនេះមានប្រសិទ្ធភាពជាងលើទូរស័ព្ទ ព្រោះអាចលើកយកទៅជិតគ្រប់ចំណុចក្នុងបន្ទប់បាន។</div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="logo"><span class="logo-dot"></span> ScanRoom</div>
+    <p class="foot-note">បង្កើតឡើងសម្រាប់ការពារភាពឯកជនរបស់អ្នកធ្វើដំណើរ។ ឧបករណ៍នេះជាជំនួយប៉ុណ្ណោះ មិនមែនជាការធានារកឃើញកាមេរ៉ាទាំងអស់ ១០០% ទេ។ រូបភាព/វីដេអូមិនត្រូវបានរក្សាទុក ឬផ្ញើចេញពីទូរស័ព្ទរបស់អ្នកឡើយ។</p>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    const a = item.querySelector('.faq-a');
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-a').style.maxHeight = null;
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // Camera scanner
+  const video = document.getElementById('camFeed');
+  const placeholder = document.getElementById('camPlaceholder');
+  const overlay = document.getElementById('scanOverlay');
+  const status = document.getElementById('scanStatus');
+  const startBtn = document.getElementById('startBtn');
+  const torchBtn = document.getElementById('torchBtn');
+  const switchBtn = document.getElementById('switchBtn');
+
+  let currentStream = null;
+  let currentFacing = 'environment';
+  let torchOn = false;
+
+  async function startCamera(facing) {
+    stopCamera();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: facing } },
+        audio: false
+      });
+      currentStream = stream;
+      video.srcObject = stream;
+      placeholder.style.display = 'none';
+      overlay.style.display = 'block';
+      status.style.display = 'block';
+      startBtn.textContent = '⏹ បិទកាមេរ៉ា';
+      startBtn.classList.add('active');
+      switchBtn.style.display = 'inline-block';
+
+      const track = stream.getVideoTracks()[0];
+      const caps = track.getCapabilities ? track.getCapabilities() : {};
+      if (caps.torch) {
+        torchBtn.style.display = 'inline-block';
+      } else {
+        torchBtn.style.display = 'none';
+      }
+    } catch (err) {
+      placeholder.querySelector('div').innerHTML =
+        'មិនអាចបើកកាមេរ៉ាបានទេ។<br>សូមអនុញ្ញាតសិទ្ធិកាមេរ៉ាក្នុងកម្មវិធីរុករករបស់អ្នក ហើយសាកល្បងម្តងទៀត។';
+    }
+  }
+
+  function stopCamera() {
+    if (currentStream) {
+      currentStream.getTracks().forEach(t => t.stop());
+      currentStream = null;
+    }
+    video.srcObject = null;
+    overlay.style.display = 'none';
+    status.style.display = 'none';
+    torchBtn.style.display = 'none';
+    switchBtn.style.display = 'none';
+    torchOn = false;
+    torchBtn.classList.remove('active');
+    torchBtn.textContent = '💡 ភ្លើង';
+    startBtn.textContent = '📷 បើកកាមេរ៉ា';
+    startBtn.classList.remove('active');
+    placeholder.style.display = 'flex';
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (currentStream) {
+      stopCamera();
+    } else {
+      startCamera(currentFacing);
+    }
+  });
+
+  switchBtn.addEventListener('click', () => {
+    currentFacing = currentFacing === 'environment' ? 'user' : 'environment';
+    startCamera(currentFacing);
+  });
+
+  torchBtn.addEventListener('click', async () => {
+    if (!currentStream) return;
+    const track = currentStream.getVideoTracks()[0];
+    try {
+      torchOn = !torchOn;
+      await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+      torchBtn.classList.toggle('active', torchOn);
+    } catch (e) {
+      torchBtn.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('beforeunload', stopCamera);
+</script>
+
+</body>
+</html>
